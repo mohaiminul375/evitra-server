@@ -34,7 +34,10 @@ router.post('/register', async (req, res) => {
         res.status(500).json({ message: `failed to signup: ${error}` });
     }
 })
-
+router.get('/', async (req, res) => {
+    const result = await User.find();
+    res.send(result)
+})
 // login for verifier
 router.post('/login', async (req, res) => {
     const { email, password } = req.body;
