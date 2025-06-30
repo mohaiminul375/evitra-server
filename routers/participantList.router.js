@@ -5,11 +5,27 @@ import mongoose from "mongoose";
 const router = Router();
 
 
-// router
+// all list
 router.get('/all-list', async (req, res) => {
-    const result = await ParticipatesList.find()
-    res.send(result)
+    try {
+        const result = await ParticipatesList.find()
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: `Failed to get events: ${error.message}` });
+    }
+
 })
+// get join data for user
+router.get('/all-list/:email', async (req, res) => {
+    try {
+        const result = await ParticipatesList.find({ email: req.params.email })
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ message: `Failed to get events: ${error.message}` });
+    }
+
+})
+// Join event
 router.post('/join-event', async (req, res) => {
     const session = await mongoose.startSession(); //session for multiple operation
     session.startTransaction();
