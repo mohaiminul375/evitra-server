@@ -23,7 +23,7 @@ router.get('/all-events/:email', async (req, res) => {
     }
 })
 
-// create a event
+// create an event
 router.post('/create-event', async (req, res) => {
     try {
         const newEvent = new Event(req.body)
@@ -33,8 +33,23 @@ router.post('/create-event', async (req, res) => {
         res.status(500).json({ message: `failed to create event: ${error}` });
     }
 })
+// Update an event
+router.put('/update-event/:id', async (req, res) => {
+    try {
+        await
+            Event.updateOne({ _id: req.params.id }, {
+                $set: {
+                    ...req.body
+                }
+            })
 
-// delete a todo
+        res.status(200).json({ success: true, message: 'Event was updated' });
+    } catch (error) {
+        res.status(500).json({ message: `failed to update event: ${error}` });
+    }
+
+})
+// delete an event
 router.delete('/:id', async (req, res) => {
     try {
         await Event.deleteOne({ _id: req.params.id })
