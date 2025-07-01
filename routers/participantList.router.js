@@ -42,7 +42,7 @@ router.get('/all-list/:email', async (req, res) => {
 // joined event by email
 router.get('/joined-event/:email', async (req, res) => {
     try {
-        const result = await ParticipatesList.find({ email: req.params.email }).sort({ event_Date: -1 }).select('-name -email -_id')
+        const result = await ParticipatesList.find({ email: req.params.email }).select('-name -email -_id')
             .populate('event_id',)
         res.status(200).json(result);
     } catch (error) {
