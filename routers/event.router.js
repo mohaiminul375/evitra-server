@@ -58,7 +58,7 @@ router.get('/all-events', async (req, res) => {
 router.get('/all-events/:email', async (req, res) => {
     try {
         const email = req.params.email
-        const result = await Event.find({ email }).sort({ event_Date: -1 }); //-1 most recent events appear first
+        const result = await Event.find({ email }).sort({ event_Date: -1 }); //-1 most recent events appear first descending
         res.status(200).json(result)
     } catch (error) {
         res.status(500).json({ message: `failed to get tasks: ${error}` });
