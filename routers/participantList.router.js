@@ -21,7 +21,7 @@ router.get('/attendance/:id', async (req, res) => {
     try {
         const title = await Event.findOne({ _id: req.params.id })
         const result = await ParticipatesList.find({ event_id: req.params.id })
-        res.status(200).json({ title: title.event_title, attendance:result });
+        res.status(200).json({ title: title.event_title, attendance: result });
     } catch (error) {
         res.status(500).json({ message: `Failed to get attendance: ${error.message}` });
     }
@@ -59,7 +59,7 @@ router.post('/join-event', async (req, res) => {
         const participant = new ParticipatesList({ email, name, event_id });
         await participant.save({ session });
 
-        // incourage attendee count and save to db
+        // encourage attendee count and save to db
         currentEvent.attendeeCount = (currentEvent.attendeeCount || 0) + 1;
         await currentEvent.save({ session });
 
@@ -74,5 +74,32 @@ router.post('/join-event', async (req, res) => {
         res.status(500).json({ message: "Failed to join event", error: error.message });
     }
 });
+// Cancel join event
+router.delete('/cancel-join/:id', async (req, res) => {
+    const session = await mongoose.startSession();
+    try {
+        await session.withTransaction(async () => {
+            const eventId = req.params.id;
+            // delete from list
+            await ParticipatesList.deleteOne({ event_id: eventId }).session(session);
+            // Find the event
+            const currentEvent = await Event.findOne({ _id: eventId }).session(session);
+            if (!currentEvent) {
+                throw new Error("Event not found");
+            }
 
+            // decrease attendee count
+            currentEvent.attendeeCount = currentEvent.attendeeCount - 1;
+            await currentEvent.save({ session });
+            session.endSession();
+        });
+
+        res.status(200).json({ success: true });
+
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(500).json({ message: `Failed to cancel: ${error.message}` });
+    }
+});
 export default router;
