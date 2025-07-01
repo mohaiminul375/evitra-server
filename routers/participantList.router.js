@@ -15,6 +15,20 @@ router.get('/all-list', async (req, res) => {
     }
 
 })
+
+// attendance list based on event id
+router.get('/attendance/:id', async (req, res) => {
+    try {
+        const title = await Event.findOne({ _id: req.params.id })
+        const result = await ParticipatesList.find({ event_id: req.params.id })
+        res.status(200).json({ title: title.event_title, attendance:result });
+    } catch (error) {
+        res.status(500).json({ message: `Failed to get attendance: ${error.message}` });
+    }
+})
+
+
+
 // get join data for user
 router.get('/all-list/:email', async (req, res) => {
     try {
